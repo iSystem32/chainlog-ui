@@ -1,35 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Chainlog API documentation - MakerDAO</title>
+        <title>Chainlog historical API - MakerDAO</title>
         <meta charset="UTF-8">
         <meta name="referrer" content="origin">
         <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     </head>
     <body>
-        <h1>Chainlog API documentation</h1>
-        <h2>A word about decentralization</h2>
-        This API is centralized. Instead of using it, consider building your own chainlog client. Feel free to use <a href="https://github.com/makerdao/chainlog-ui">this API’s source code</a> as an example. Bear in mind that you need access to an archival node in order to obtain full historical information.
-        <h2>File structure</h2>
+        <h1>Chainlog historical API</h1>
+        <h2>Usage</h2>
+        <h3>Get a list of all available chains and versions</h3>
+        <pre>GET <a href="https://chainlog.makerdao.com/api/index.json">https://chainlog.makerdao.com/api/index.json</a></pre>
+        <h3>Get the active version on a given chain</h3>
+        <pre>GET https://chainlog.makerdao.com/api/{chain}/active.json</pre>
+        <h3>Get a specific version on a given chain</h3>
+        <pre>GET https://chainlog.makerdao.com/api/{chain}/{version}.json</pre>
+        <h2>Code examples</h2>
+        You can set your JavaScript app to use this API <a href="https://github.com/makerdao/chainlog-ui/blob/main/examples/api.js">in the following way</a>:
         <pre>
-https://chainlog.makerdao.com
-├── <a href="https://chainlog.makerdao.com/api.html">api.html</a> (this file)
-├── <a href="https://chainlog.makerdao.com/index.json">index.json</a>
-├── mainnet
-│   ├── <a href="https://chainlog.makerdao.com/mainnet/active.json">active.json</a>
-│   ├── <a href="https://chainlog.makerdao.com/mainnet/1.9.12.json">1.9.12.json</a>
-│   └── … 
-├── goerli
-│   ├── <a href="https://chainlog.makerdao.com/goerli/active.json">active.json</a>
-│   ├── <a href="https://chainlog.makerdao.com/goerli/1.9.11.json">1.9.11.json</a>
-│   └── …
-└── …
+  const url = "https://chainlog.makerdao.com/api/mainnet/active.json";
+  const response = await fetch(url);
+  const chainlog = await response.json();
+  console.log(chainlog);
         </pre>
-        <h2>Get a list of all available chains and versions</h2>
-        The <a href="https://chainlog.makerdao.com/index.json">index.json</a> file contains a list of all the available chainlog versions for all the chains where MCD is deployed, and includes information about the active version on each chain.
-        <h2>Get the active version on a given chain</h2>
-        <pre>GET https://chainlog.makerdao.com/{chain}/active.json</pre>
-        <h2>Get a specific version</h2>
-        <pre>GET https://chainlog.makerdao.com/{chain}/{version}.json</pre>
+        If you care about decentralization, however, <b>do not use this API</b>. Instead <a href="https://github.com/makerdao/chainlog-ui/blob/main/examples/ethers.js">query the blockchain directly</a>:
+        <pre>
+  const address = "0xda0ab1e0017debcd72be8599041a2aa3ba7e740f";
+  const abi = [
+    "function list() external view returns (bytes32[])",
+    "function getAddress(bytes32) external view returns (address)"
+  ];
+  const provider = ethers.getDefaultProvider();
+  const chainlog = new ethers.Contract(address, abi, provider);
+  const list = await chainlog.list();
+  const result = {};
+  for (let keyHex of list) {
+    const key = ethers.utils.parseBytes32String(keyHex);
+    const address = await chainlog.getAddress(keyHex);
+    result[key] = address;
+  }
+  console.log(result);
+        </pre>
+        Please note that the above code will only retreive the latest data.<br/><br/>
+        You can also ditch web3 libraries and perform low-level JSON RPC calls. Here is an <a href="https://github.com/makerdao/chainlog-ui/blob/main/examples/python.py">example with Python</a>:
+        <pre>
+  keys = requests.post("https://mainnet.infura.io/v3/" + infura_key, json={
+      "jsonrpc": "2.0",
+      "method": "eth_call",
+      "params": [{
+          "to": "0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F",
+          "data": "0x0f560cd7"
+      }, "latest"],
+      "id": 0
+  }).json()["result"][130:]
+  result = {}
+  for i in range(0, len(keys), 64):
+      address = "0x" + requests.post("https://mainnet.infura.io/v3/" + infura_key, json={
+          "jsonrpc": "2.0",
+          "method": "eth_call",
+          "params": [{
+              "to": "0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F",
+              "data": "0x21f8a721" + keys[i:i+64]
+          }, "latest"],
+          "id": 0
+      }).json()["result"][26:]
+      key = bytes.fromhex(keys[i:i+64]).replace(b"\x00", b"").decode("ascii")
+      result[key] = address
+  print(result)
+        </pre>
+        The above code has the advantage that it will allow you to retreive historical data as long as you are using an archival node. In order to do that, replace <code>"latest"</code> with a specific block number.
+        <h2>Available resources in this API</h2>
+        <pre>
+https://chainlog.makerdao.com/api
+├── <a href="https://chainlog.makerdao.com/api/index.json">index.json</a>
+<div id="canvas"></div>
+        </pre>
+        <script>
+const main = async () => {
+  const canvas = document.getElementById("canvas");
+  const response = await fetch("api/index.json");
+  const list = await response.json();
+  const chains = Object.keys(list);
+  for (let i = 0; i < chains.length; i++) {
+    const chain = chains[i];
+    if (i === chains.length - 1) {
+      canvas.innerHTML += "└── " + chain + "<br/>";
+    } 
+    else {
+      canvas.innerHTML += "├── " + chain + "<br/>";
+    }
+    const pipe1 = i === chains.length - 1 ? "    " : "│   ";
+    if (list[chain].active !== null) {
+      canvas.innerHTML += pipe1 + "├── " + '<a href="api/' + chain + '/active.json">active.json</a><br/>';
+    }
+    const versions = list[chain].all;
+    for (let i = 0; i < versions.length; i++) {
+      const version = versions[i];
+      const pipe2 = i === versions.length - 1 ? "└── " : "├── ";
+      canvas.innerHTML += pipe1 + pipe2 + '<a href="api/' + chain + '/' + version + '.json">' + version + '.json</a><br/>';
+    }
+  }
+}
+main();
+        </script>
     </body>
 </html>

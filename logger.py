@@ -5,6 +5,8 @@ import requests
 import json
 import time
 from datetime import datetime
+from eth_utils import to_checksum_address
+from github import Github, GithubException
 
 def call(chain, calldata):
     infura_key = os.environ["INFURA_KEY"]
@@ -55,13 +57,21 @@ def get_log(chain):
         address_bytes32 = call(chain, get_address_signature + name_hex)
         name = to_ascii(name_hex)
         address = "0x" + address_bytes32[2 * (1 + 12) :]
-        log[name] = address
+        address_checksum = to_checksum_address(address)
+        log[name] = address_checksum
     return log
+
+def push(path, contents, message):
+    try:
+        file = repo.get_contents(path)
+        repo.update_file(path, message, contents, file.sha)
+    except:
+        repo.create_file(path, message, contents)
 
 def update(chain):
     version = get_version(chain)
-    path = "{}/{}.json".format(chain, version)
-    index_file = open("index.json", "r")
+    path = "api/{}/{}.json".format(chain, version)
+    index_file = open("api/index.json", "r")
     index = json.load(index_file)
     index_file.close()
     if not os.path.exists(path) or version not in index[chain]["all"]:
@@ -69,20 +79,32 @@ def update(chain):
         log = get_log(chain)
         print("done.")
         log_file = open(path, "w")
-        json.dump(log, log_file, indent=2)
+        contents = json.dumps(log, indent=2)
+        log_file.write(contents)
         log_file.close()
-        active_file = open("{}/active.json".format(chain), "w")
-        json.dump(log, active_file, indent=2)
+        message = "feat: add chainlog file for {} v{}".format(chain, version)
+        push(path, contents, message)
+        active_path = "api/{}/active.json".format(chain)
+        active_file = open(active_path, "w")
+        active_file.write(contents)
         active_file.close()
+        message = "feat: update active file for {} v{}".format(chain, version)
+        push(active_path, contents, message)
         if version not in index[chain]["all"]:
             index[chain]["all"].insert(0, version)
         index[chain]["active"] = version
-        index_file = open("index.json", "w")
-        json.dump(index, index_file, indent=2)
+        index_path = "api/index.json"
+        index_file = open(index_path, "w")
+        index_contents = json.dumps(index, indent=2)
+        index_file.write(index_contents)
         index_file.close()
+        message = "feat: update index file for {} v{}".format(chain, version)
+        push(index_path, index_contents, message)
     else:
         print("{} - no changes on {}".format(datetime.now(), chain))
 
+g = Github(os.environ["GITHUB_TOKEN"])
+repo = g.get_repo(os.environ["CHAINLOG_REPO"])
 chains = ["mainnet", "goerli"]
 while True:
     for chain in chains:

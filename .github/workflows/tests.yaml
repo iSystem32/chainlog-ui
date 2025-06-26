@@ -1,0 +1,30 @@
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+name: Build and test containers
+
+jobs:
+  deploy:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Start and test chainlog containers
+      id: start-containers
+      env:
+        INFURA_KEY: ${{ secrets.INFURA_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      working-directory: ./
+      run: |
+        docker-compose up -d
+        sleep 10
+        docker ps | grep chainlog-ui
+        docker ps | grep chainlog-logger || (docker logs chainlog-logger && exit 1)
+        curl -I localhost:8080
+        docker logs chainlog-logger

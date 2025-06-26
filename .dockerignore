@@ -1,0 +1,6 @@
+.env*
+.git
+.github
+.gitignore
+Dockerfile*
+docker-compose*

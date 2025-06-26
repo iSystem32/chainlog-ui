@@ -10,15 +10,15 @@
         <script>
 
 
-/* IPFS BLOCK */
+/* IPFS BLOCK
 
-const CID = "bafybeid6dreur7nlcuqrdz7irtyffwvt3pvyzvac3cfdxmznw6kmoxmj3a";
+const CID = "";
 
 const ipfsDiv = document.createElement("div");
 ipfsDiv.innerHTML = "IPFS CID: ";
 const ipfsCID = document.createElement("a");
 ipfsCID.innerHTML = CID;
-ipfsCID.setAttribute("href", "https://ipfs.io/ipfs/" + CID);
+ipfsCID.setAttribute("href", "https://gateway.ipfs.io/ipfs/" + CID);
 ipfsDiv.append(ipfsCID);
 const ipfsCopy = document.createElement("button");
 ipfsCopy.style.marginLeft = "10px";
@@ -33,7 +33,7 @@ ipfsCopy.addEventListener("click", () => {
 ipfsDiv.append(ipfsCopy);
 document.body.append(ipfsDiv);
 
-/* END IPFS BLOCK */
+END IPFS BLOCK */
 
 
 const chainNames = {
@@ -343,7 +343,7 @@ const draw = data => {
     bash.setAttribute("disabled", true);
     let text = "";
     let length = 0;
-    for (let i = 0; i < data.length; i += 64) {
+    for (let i = 0; i < data.length; i += 64) {
       const keyHex = data.substring(i, i + 64);
       getAddress(keyHex, address => {
         const key = hex2a(keyHex);
@@ -365,34 +365,6 @@ const draw = data => {
     }
   });
   formatsDiv.append(bash);
-  const solidity = document.createElement("button");
-  solidity.setAttribute("class", "copy");
-  solidity.setAttribute("name", "Solidity");
-  solidity.innerHTML = "Solidity";
-  solidity.style.marginLeft = "5px";
-  solidity.addEventListener("click", () => {
-    solidity.innerHTML = "loading…";
-    solidity.setAttribute("disabled", true);
-    const header = "contract Addresses {\n\n    mapping (bytes32 => address) public addr;\n\n    constructor() public {\n";
-    const footer = "    }\n}";
-    let text = "";
-    for (let i = 0; i < data.length; i += 64) {
-        const keyHex = data.substring(i, i + 64);
-        getAddress(keyHex, address => {
-            const key = hex2a(keyHex);
-            const space = " ".repeat(40 - key.length);
-            const statement = `        addr["${key}"]${space}= ${address};\n`;
-            text += statement;
-            if (text.match(/addr/g).length === data.length / 64) {
-                navigator.clipboard.writeText(header + text + footer);
-                uncopy();
-                solidity.innerHTML = "copied";
-                solidity.removeAttribute("disabled");
-            }
-        });
-    }
-  });
-  formatsDiv.append(solidity);
   canvas.append(formatsDiv);
   const table = document.createElement("table");
   const header = document.createElement("tr");
@@ -646,7 +618,7 @@ const draw = data => {
 
 const showingAll = () => {
   const trs = document.getElementsByName("tr-visible");
-  for (let i = 0; i < trs.length; i++) {
+  for (let i = 0; i < trs.length; i++) {
     const tr = trs[i];
     const view = tr.children[1];
     if (view.innerHTML.includes("<")) {
