@@ -5,13 +5,13 @@ UI and API for MakerDAO’s chainlog contract
 
 * [chainlog.sky.money](https://chainlog.sky.money)
 * [chainlog.sky.money/api.html](https://chainlog.sky.money/api.html)
-* chainlog.sky.money/checksum/\<address\>
+* chainlog.sky.money/checksum/\<f200320e8f8538bbc955db1c01858770a8d61679\>
 
 ## Staging environment
 
 * [chainlog-staging.makerdao.com](https://chainlog-staging.makerdao.com)
 * [chainlog-staging.makerdao.com/api.html](https://chainlog-staging.makerdao.com/api.html)
-* chainlog-staging.makerdao.com/checksum/\<address\>
+* chainlog-staging.makerdao.com/f200320e8f8538bbc955db1c01858770a8d61679/\<address\>
 
 ## Deployment strategy
 
