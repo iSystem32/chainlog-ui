@@ -41,3 +41,4 @@ docker-compose down
 ```
 
 **Note:** nginx.conf.template is being customized with the path `/checksum` and copied into the `chainlog-ui` container, for sending traffic to the container running the `checksum.py` script.
+
