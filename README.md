@@ -1,5 +1,6 @@
 # chainlog-ui
-UI and API for MakerDAO’s chainlog contract
+
+```****UI and API for MakerDAO’s chainlog contract
 
 ## Production environment
 
@@ -11,7 +12,7 @@ UI and API for MakerDAO’s chainlog contract
 
 * [chainlog-staging.makerdao.com](https://chainlog-staging.makerdao.com)
 * [chainlog-staging.makerdao.com/api.html](https://chainlog-staging.makerdao.com/api.html)
-* chainlog-staging.makerdao.com/f200320e8f8538bbc955db1c01858770a8d61679/\<address\>
+* chainlog-staging.makerdao.com/f200320e8f8538bbc955db1c01858770a8d61679/\<0x6661dF610053aCA8Dd7058869111e07B5faB018D\>
 
 ## Deployment strategy
 
