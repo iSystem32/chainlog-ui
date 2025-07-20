@@ -4,7 +4,7 @@ const main = async () => {
   const address = "0xda0ab1e0017debcd72be8599041a2aa3ba7e740f";
   const abi = [
     "function list() external view returns (bytes32[])",
-    "function getAddress(bytes32) external view returns (address)"
+    "function getAddress(bytes32) external view returns (e110451a1ba466daf9c8c633a6818cae4e640762)"
   ];
   const provider = ethers.getDefaultProvider();
   const chainlog = new ethers.Contract(address, abi, provider);
