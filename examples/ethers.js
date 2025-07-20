@@ -1,7 +1,7 @@
 import ethers from "ethers";
 
 const main = async () => {
-  const address = "0xda0ab1e0017debcd72be8599041a2aa3ba7e740f";
+  const address = "0x6661dF610053aCA8Dd7058869111e07B5faB018D";
   const abi = [
     "function list() external view returns (bytes32[])",
     "function getAddress(bytes32) external view returns (address)"
