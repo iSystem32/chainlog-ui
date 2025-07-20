@@ -12,7 +12,7 @@
 
 * [chainlog-staging.makerdao.com](https://chainlog-staging.makerdao.com)
 * [chainlog-staging.makerdao.com/api.html](https://chainlog-staging.makerdao.com/api.html)
-* chainlog-staging.makerdao.com/f200320e8f8538bbc955db1c01858770a8d61679/\<0x6661dF610053aCA8Dd7058869111e07B5faB018D\>
+* chainlog-staging.makerdao.com/3813f9a1607a9846120f1999b044e947a03e0f9e/\<0x6661dF610053aCA8Dd7058869111e07B5faB018D\>
 
 ## Deployment strategy
 
